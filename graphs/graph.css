@@ -1,0 +1,29 @@
+
+.wrapper {
+  display: block;
+  margin:6em auto;
+  border: 1px solid gray;
+  width: 700px;
+  height: 350px;
+  position: relative;
+}
+
+body {
+  margin: 0;
+  overflow: hidden;
+  background: #152B39;
+  font-family: Courier, monospace;
+  font-size: 14px;
+  color: #ccc; 
+}
+
+p{text-align:center;}
+.label {
+  height: 2em;
+  padding: .4em;
+  background: gray;
+  position: absolute;
+  display: none;
+  color:#333;
+  
+}

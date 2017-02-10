@@ -16,7 +16,7 @@ ctx.fillStyle = "#ccc";
 ctx.font = "14px monospace";
 
 var grd = ctx.createLinearGradient(0, 0, 0, cy);
-grd.addColorStop(0, "hsla(167,72%,60%,1)");
+grd.addColorStop(0, "hsla(54, 95%, 67%, 1)");
 grd.addColorStop(1, "hsla(167,72%,60%,0)");
 
 var oData = {

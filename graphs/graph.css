@@ -1,11 +1,14 @@
 
 .wrapper {
   display: block;
-  margin:6em auto;
+  margin:7em auto;
   border: 1px solid gray;
-  width: 700px;
+  width: 650px;
   height: 350px;
   position: relative;
+    float: left;
+    margin-left: 3em;
+    
 }
 
 body {
@@ -17,13 +20,28 @@ body {
   color: #ccc; 
 }
 
-p{text-align:center;}
-.label {
-  height: 2em;
-  padding: .4em;
-  background: gray;
-  position: absolute;
-  display: none;
-  color:#333;
-  
+
+#sentiment{
+    position: relative;
+    border: 1px solid gray;
+    width: 31em;
+    height: 30em;
+    float: right;
+    margin:7em auto;
+    margin-right: 4em;
+    background-color: lightyellow
+
+}
+
+.sentiment-text{
+    text-align: center;
+    font-family: Pacifico;
+}
+
+.sentiment-text2{
+    text-align: left;
+    padding-left: 1em;
+    font-size: 16px;
+    font-family: Pacifico;
+    
 }

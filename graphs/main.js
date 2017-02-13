@@ -1,305 +1,168 @@
-$(document).ready(function(){
-
-var label = document.querySelector(".label");
-var c = document.getElementById("c");
-var ctx = c.getContext("2d");
-var cw = c.width = 700;
-var ch = c.height = 350;
-var cx = cw / 2,
-  cy = ch / 2;
-var rad = Math.PI / 180;
-var frames = 0;
-
-ctx.lineWidth = 1;
-ctx.strokeStyle = "#999";
-ctx.fillStyle = "#ccc";
-ctx.font = "14px monospace";
-
-var grd = ctx.createLinearGradient(0, 0, 0, cy);
-grd.addColorStop(0, "hsla(54, 95%, 67%, 1)");
-grd.addColorStop(1, "hsla(167,72%,60%,0)");
-
-var oData = {
-  "2008": 10,
-  "2009": 39.9,
-  "2010": 17,
-  "2011": 30.0,
-  "2012": 5.3,
-  "2013": 38.4,
-  "2014": 15.7,
-  "2015": 9.0
-};
-
-var valuesRy = [];
-var propsRy = [];
-for (var prop in oData) {
-
-  valuesRy.push(oData[prop]);
-  propsRy.push(prop);
-}
-
-
-var vData = 4;
-var hData = valuesRy.length;
-var offset = 50.5; //offset chart axis
-var chartHeight = ch - 2 * offset;
-var chartWidth = cw - 2 * offset;
-var t = 1 / 7; // curvature : 0 = no curvature 
-var speed = 2; // for the animation
-
-var A = {
-  x: offset,
-  y: offset
-}
-var B = {
-  x: offset,
-  y: offset + chartHeight
-}
-var C = {
-  x: offset + chartWidth,
-  y: offset + chartHeight
-}
-
-/*
-      A  ^
-	    |  |  
-	    + 25
-	    |
-	    |
-	    |
-	    + 25  
-      |__|_________________________________  C
-      B
-*/
-
-// CHART AXIS -------------------------
-ctx.beginPath();
-ctx.moveTo(A.x, A.y);
-ctx.lineTo(B.x, B.y);
-ctx.lineTo(C.x, C.y);
-ctx.stroke();
-
-// vertical ( A - B )
-var aStep = (chartHeight - 50) / (vData);
-
-var Max = Math.ceil(arrayMax(valuesRy) / 10) * 10;
-var Min = Math.floor(arrayMin(valuesRy) / 10) * 10;
-var aStepValue = (Max - Min) / (vData);
-console.log("aStepValue: " + aStepValue); //8 units
-var verticalUnit = aStep / aStepValue;
-
-var a = [];
-ctx.textAlign = "right";
-ctx.textBaseline = "middle";
-for (var i = 0; i <= vData; i++) {
-
-  if (i == 0) {
-    a[i] = {
-      x: A.x,
-      y: A.y + 25,
-      val: Max
-    }
-  } else {
-    a[i] = {}
-    a[i].x = a[i - 1].x;
-    a[i].y = a[i - 1].y + aStep;
-    a[i].val = a[i - 1].val - aStepValue;
-  }
-  drawCoords(a[i], 3, 0);
-}
-
-//horizontal ( B - C )
-var b = [];
-ctx.textAlign = "center";
-ctx.textBaseline = "hanging";
-var bStep = chartWidth / (hData + 1);
-
-for (var i = 0; i < hData; i++) {
-  if (i == 0) {
-    b[i] = {
-      x: B.x + bStep,
-      y: B.y,
-      val: propsRy[0]
-    };
-  } else {
-    b[i] = {}
-    b[i].x = b[i - 1].x + bStep;
-    b[i].y = b[i - 1].y;
-    b[i].val = propsRy[i]
-  }
-  drawCoords(b[i], 0, 3)
-}
-
-function drawCoords(o, offX, offY) {
-  ctx.beginPath();
-  ctx.moveTo(o.x - offX, o.y - offY);
-  ctx.lineTo(o.x + offX, o.y + offY);
-  ctx.stroke();
-
-  ctx.fillText(o.val, o.x - 2 * offX, o.y + 2 * offY);
-}
-//----------------------------------------------------------
-
-// DATA
-var oDots = [];
-var oFlat = [];
-var i = 0;
-
-for (var prop in oData) {
-  oDots[i] = {}
-  oFlat[i] = {}
-
-  oDots[i].x = b[i].x;
-  oFlat[i].x = b[i].x;
-
-  oDots[i].y = b[i].y - oData[prop] * verticalUnit - 25;
-  oFlat[i].y = b[i].y - 25;
-
-  oDots[i].val = oData[b[i].val];
-  
-  i++
-}
-
-
-
-///// Animation Chart ///////////////////////////
-//var speed = 3;
-function animateChart() {
-  requestId = window.requestAnimationFrame(animateChart);
-  frames += speed; //console.log(frames)
-  ctx.clearRect(60, 0, cw, ch - 60);
-  
-  for (var i = 0; i < oFlat.length; i++) {
-    if (oFlat[i].y > oDots[i].y) {
-      oFlat[i].y -= speed;
-    }
-  }
-  drawCurve(oFlat);
-  for (var i = 0; i < oFlat.length; i++) {
-      ctx.fillText(oDots[i].val, oFlat[i].x, oFlat[i].y - 25);
-      ctx.beginPath();
-      ctx.arc(oFlat[i].x, oFlat[i].y, 3, 0, 2 * Math.PI);
-      ctx.fill();
-    }
-
-  if (frames >= Max * verticalUnit) {
-    window.cancelAnimationFrame(requestId);
+$(document).ready(function() {
+        var names = ['Facebook', 'Instagram', 'Text Messages', 'Snapchat'];
     
-  }
-}
-requestId = window.requestAnimationFrame(animateChart);
+        var groups = new vis.DataSet();
+            groups.add({
+                id: 0,
+                content: names[0],
+                //className: 'custom-style0',
+              })
+            groups.add({
+                id: 1,
+                content: names[1],
+                //className: 'custom-style1',
+            })
+            groups.add({
+                id: 2,
+                content: names[2],
+                //className: 'custom-style2',
+            })
+            groups.add({
+                id: 3,
+                content: names[3],
+                //className: 'custom-style3',
+            });
+            
+        var container = document.getElementById('visualization');
+        
+    
+        var d = new Date();
+        var seven = new Date();
+        var six = new Date();
+        var five = new Date();
+        var four = new Date();
+        var three = new Date();
+        var two = new Date();
+        var one = new Date();
+    
+    
+        var test = d.getDate();
+        seven.setDate(d.getDate() - 7);
+        six.setDate(d.getDate() - 6);
+        five.setDate(d.getDate() - 5);
+        four.setDate(d.getDate() - 4);
+        three.setDate(d.getDate() - 3);
+        two.setDate(d.getDate() - 2);
+        one.setDate(d.getDate() - 1);
+        
+        var items = [
+                {x: seven, y: 2, group: 0},
+              {x: six, y: 23, group: 0},
+              {x: five, y: 10, group: 0},
+              {x: four, y: 25, group: 0},
+              {x: three, y: 30, group: 0},
+              {x: two, y: 10, group: 0},
+              {x: one, y: 15, group: 0},
+              {x: Date(), y: 30, group: 0},
+              
+                {x: seven, y: 2, group: 1},
+              {x: six, y: 23, group: 1},
+              {x: five, y: 5, group: 1},
+              {x: four, y: 5, group: 1},
+              {x: three, y: 35, group: 1},
+              {x: two, y: 40, group: 1},
+              {x: one, y: 2, group: 1},
+              {x: Date(), y: 20, group: 1},
+              
+            {x: seven, y: 7, group: 2},
+              {x: six, y: 5, group: 2},
+              {x: five, y: 3, group: 2},
+              {x: four, y: 4, group: 2},
+              {x: three, y: 5, group: 2},
+              {x: two, y: 20, group: 2},
+              {x: one, y: 0, group: 2},
+              {x: Date(), y: 20, group: 2},
+              
+            {x: seven, y: 6, group: 3},
+              {x: six, y: 35, group: 3},
+              {x: five, y: 0, group: 3},
+              {x: four, y: 0, group: 3},
+              {x: three, y: 0, group: 3},
+              {x: two, y: 10, group: 3},
+              {x: one, y: 20, group: 3},
+              {x: Date(), y: 30, group: 3}
+          ];
+            
 
-/////// EVENTS //////////////////////
-c.addEventListener("mousemove", function(e) {
-  label.innerHTML = "";
-  label.style.display = "none";
-  this.style.cursor = "default";
+          var dataset = new vis.DataSet(items);
+          var options = {
+              start: d.setDate(d.getDate() - 7),
+              end: Date(),
+              dataAxis: {left: {title: {text: 'Activity in # of instances'}}}
+            };
+          
+        var graph2d = new vis.Graph2d(container, items, groups, options);
 
-  var m = oMousePos(this, e);
-  for (var i = 0; i < oDots.length; i++) {
-
-    output(m, i);
-  }
-
-}, false);
-
-function output(m, i) {
-  ctx.beginPath();
-  ctx.arc(oDots[i].x, oDots[i].y, 20, 0, 2 * Math.PI);
-  if (ctx.isPointInPath(m.x, m.y)) {
-    //console.log(i);
-    label.style.display = "block";
-    label.style.top = (m.y + 10) + "px";
-    label.style.left = (m.x + 10) + "px";
-    label.innerHTML = "<strong>" + propsRy[i] + "</strong>: " + valuesRy[i] + "%";
-    c.style.cursor = "pointer";
-  }
-}
-
-// CURVATURE
-function controlPoints(p) {
-  // given the points array p calculate the control points
-  var pc = [];
-  for (var i = 1; i < p.length - 1; i++) {
-    var dx = p[i - 1].x - p[i + 1].x; // difference x
-    var dy = p[i - 1].y - p[i + 1].y; // difference y
-    // the first control point
-    var x1 = p[i].x - dx * t;
-    var y1 = p[i].y - dy * t;
-    var o1 = {
-      x: x1,
-      y: y1
-    };
-
-    // the second control point
-    var x2 = p[i].x + dx * t;
-    var y2 = p[i].y + dy * t;
-    var o2 = {
-      x: x2,
-      y: y2
-    };
-
-    // building the control points array
-    pc[i] = [];
-    pc[i].push(o1);
-    pc[i].push(o2);
-  }
-  return pc;
-}
-
-function drawCurve(p) {
-
-  var pc = controlPoints(p); // the control points array
-
-  ctx.beginPath();
-  //ctx.moveTo(p[0].x, B.y- 25);
-  ctx.lineTo(p[0].x, p[0].y);
-  // the first & the last curve are quadratic Bezier
-  // because I'm using push(), pc[i][1] comes before pc[i][0]
-  ctx.quadraticCurveTo(pc[1][1].x, pc[1][1].y, p[1].x, p[1].y);
-
-  if (p.length > 2) {
-    // central curves are cubic Bezier
-    for (var i = 1; i < p.length - 2; i++) {
-      ctx.bezierCurveTo(pc[i][0].x, pc[i][0].y, pc[i + 1][1].x, pc[i + 1][1].y, p[i + 1].x, p[i + 1].y);
-    }
-    // the first & the last curve are quadratic Bezier
-    var n = p.length - 1;
-    ctx.quadraticCurveTo(pc[n - 1][0].x, pc[n - 1][0].y, p[n].x, p[n].y);
-  }
-
-  //ctx.lineTo(p[p.length-1].x, B.y- 25);
-  ctx.stroke();
-  ctx.save();
-  ctx.fillStyle = grd;
-  ctx.fill();
-  ctx.restore();
-}
-
-function arrayMax(array) {
-  return Math.max.apply(Math, array);
-};
-
-function arrayMin(array) {
-  return Math.min.apply(Math, array);
-};
-
-function oMousePos(canvas, evt) {
-  var ClientRect = canvas.getBoundingClientRect();
-  return { //objeto
-    x: Math.round(evt.clientX - ClientRect.left),
-    y: Math.round(evt.clientY - ClientRect.top)
-  }
-}
 
     
+//fill external legend
 
+    
+ function populateExternalLegend() {
+    var groupsData = groups.get();
+    var legendDiv = document.getElementById("Legend");
+    legendDiv.innerHTML = "";
+    // get for all groups:
+    for (var i = 0; i < groupsData.length; i++) {
+      // create divs
+      var containerDiv = document.createElement("div");
+      var iconDiv = document.createElement("div");
+      var descriptionDiv = document.createElement("div");
+      // give divs classes and Ids where necessary
+      containerDiv.className = 'legend-element-container';
+      containerDiv.id = groupsData[i].id + "_legendContainer"
+      iconDiv.className = "icon-container";
+      descriptionDiv.className = "description-container";
+        
+      // get the legend for this group.
+      var legend = graph2d.getLegend(groupsData[i].id,30,30);
+        
+      // append class to icon. All styling classes from the vis.css/vis-timeline-graph2d.min.css have been copied over into the head here to be able to style the
+      // icons with the same classes if they are using the default ones.
+      legend.icon.setAttributeNS(null, "class", "legend-icon");
+      // append the legend to the corresponding divs
+      iconDiv.appendChild(legend.icon);
+      descriptionDiv.innerHTML = legend.label;
+        
+      // determine the order for left and right orientation
+      if (legend.orientation == 'left') {
+        descriptionDiv.style.textAlign = "left";
+        containerDiv.appendChild(iconDiv);
+        containerDiv.appendChild(descriptionDiv);
+            }
+      else {
+        descriptionDiv.style.textAlign = "right";
+        containerDiv.appendChild(descriptionDiv);
+        containerDiv.appendChild(iconDiv);
+      }
+      // append to the legend container div
+      legendDiv.appendChild(containerDiv);
+      // bind click event to this legend element.
+      containerDiv.onclick = toggleGraph.bind(this, groupsData[i].id);
+      
+    }
+  }
+  /**
+   * This function switches the visible option of the selected group on an off.
+   * @param groupId
+   */
+  function toggleGraph(groupId) {
+    // get the container that was clicked on.
+    var container = document.getElementById(groupId + "_legendContainer")
+    // if visible, hide
+    if (graph2d.isGroupVisible(groupId) == true) {
+      groups.update({id:groupId, visible:false});
+      //container.className = container.className + " hidden";
+    }
+    else { // if invisible, show
+      groups.update({id:groupId, visible:true});
+      container.className = container.className.replace("hidden","");
+    }
+  }
+  populateExternalLegend();
+    
+    
 });
-
-
-
-
-
 
 
  
